@@ -8,7 +8,7 @@ async function handleEvent({ event, slaveClients }) {
   const entities = event.message.entities;
   const chatId = event.message.peerId.channelId?.value.toString();
   if (
-    chatId === process.env.HELICOPTER_TEST_CHANNEL_ID &&
+    chatId === process.env.HELICOPTER_CHANNEL_ID &&
     (message.includes("Активно") || message.includes("Виконано"))
   ) {
     for (const en of entities) {

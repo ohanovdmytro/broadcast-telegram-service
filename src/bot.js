@@ -10,7 +10,7 @@ const { handleEvent } = require("./handlers/handleEvent");
 const { masterbot } = require("./static/userbots");
 const { userbots } = require("./static/userbots");
 
-const sourceChatId = process.env.HELICOPTER_TEST_CHANNEL_ID;
+const sourceChatId = process.env.HELICOPTER_CHANNEL_ID;
 
 const masterSession = new StoreSession("session_master");
 const slaveSessions = [
