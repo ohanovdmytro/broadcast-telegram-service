@@ -1,34 +1,48 @@
-const fs = require("fs").promises;
-const path = require("path");
+const { Api } = require("telegram");
+const { getMessage } = require("../helpers/getMessage");
 
-async function handleEvent(event) {
+const textMessage = getMessage();
+
+async function handleEvent({ event, slaveClients }) {
   const message = event.message.message;
   const entities = event.message.entities;
-
-  if (message.includes("Активно") || message.includes("Виконано")) {
+  const chatId = event.message.peerId.channelId?.value.toString();
+  if (
+    chatId === process.env.HELICOPTER_TEST_CHANNEL_ID &&
+    (message.includes("Активно") || message.includes("Виконано"))
+  ) {
     for (const en of entities) {
       if (en.className === "MessageEntityMentionName") {
-        const userId = Number(en.userId.value);
+        let slaveClientCounter = 0;
+        let messageSent = false;
 
-        try {
-          const filePath = path.join(
-            __dirname,
-            "..",
-            "..",
-            "storage",
-            "users.json"
-          );
-          let existingData = [];
+        while (slaveClientCounter < slaveClients.length && !messageSent) {
+          const slaveClient = slaveClients[slaveClientCounter];
+
           try {
-            const jsonData = await fs.readFile(filePath, "utf-8");
-            existingData = JSON.parse(jsonData);
-          } catch (error) {}
-          existingData.push({ id: userId });
+            const userIdEntity = await slaveClient.getEntity(
+              Number(en.userId.value)
+            );
 
-          const updatedJsonData = JSON.stringify(existingData, null, 2);
-          await fs.writeFile(filePath, updatedJsonData);
-        } catch (error) {
-          console.error("Error writing userId to storage/users.json:", error);
+            await slaveClient.sendMessage(`${userIdEntity.username}`, {
+              message: textMessage,
+            });
+            console.log(
+              `Message sent to ${Number(en.userId.value)} using client ${
+                slaveClientCounter + 1
+              }`
+            );
+
+            messageSent = true;
+          } catch (error) {
+            console.error(
+              `Error sending message to user using client ${
+                slaveClientCounter + 1
+              }:`,
+              error
+            );
+            slaveClientCounter++;
+          }
         }
       }
     }

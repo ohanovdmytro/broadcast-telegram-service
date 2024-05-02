@@ -25,13 +25,13 @@ const userbots = [
   },
 ];
 
-const superbot = {
-  apiId: Number(process.env.API_ID_SUPER),
-  apiHash: process.env.API_HASH_SUPER,
-  phoneNumber: process.env.PHONE_NUMBER_SUPER,
+const masterbot = {
+  apiId: Number(process.env.API_ID_MASTER),
+  apiHash: process.env.API_HASH_MASTER,
+  phoneNumber: process.env.PHONE_NUMBER_MASTER,
 };
 
 module.exports = {
   userbots,
-  superbot,
+  masterbot,
 };
