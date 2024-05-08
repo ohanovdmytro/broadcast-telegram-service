@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "npx nodemon src/bot.js",
-    "test": "npx nodemon src/bot_test.js",
-    "start": "node src/bot.js"
+    "dev": "npx nodemon src/app.js",
+    "start": "node src/app.js",
+    "session": "npx nodemon src/helpers/startClients.js"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +14,7 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "nodemon": "^3.1.0",
+    "pm2": "^5.3.1",
     "readline": "^1.3.0",
     "telegram": "^2.20.15"
   }
