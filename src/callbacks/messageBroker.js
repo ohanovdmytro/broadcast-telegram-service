@@ -1,23 +1,22 @@
-const { start } = require("../app");
-const { handleEvent } = require("./handlers/handleEvent");
+const { start } = require("../userbot");
+const { handleEvent } = require("./handleEvent");
 
 async function processEventQueue(eventQueue) {
   while (eventQueue.length > 0) {
-    const event = eventQueue.shift();
+    const eventElement = eventQueue.shift();
     await handleEvent(
       {
-        event: event,
-        masterClient: masterClient,
-        slaveClients: slaveClients,
+        event: eventElement.event,
+        masterClient: eventElement.masterClient,
       },
       () => start()
     );
   }
 }
 
-function addEventToQueue(event) {
+function addEventToQueue({ event, masterClient }) {
   const eventQueue = [];
-  eventQueue.push(event);
+  eventQueue.push({ event, masterClient });
   if (eventQueue.length === 1) {
     processEventQueue(eventQueue);
   }

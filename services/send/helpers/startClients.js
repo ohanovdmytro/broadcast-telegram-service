@@ -1,16 +1,17 @@
 require("dotenv").config();
 
-const { TelegramClient, client } = require("telegram");
+const { TelegramClient } = require("telegram");
 const { StoreSession } = require("telegram/sessions");
 
 const { askQuestions } = require("./askQuestions");
-const { userbots } = require("../static/userbots");
+const { userbots } = require("../const/userbots");
 
 const slaveSessions = [
   new StoreSession("session_1"),
   new StoreSession("session_2"),
   new StoreSession("session_3"),
   new StoreSession("session_4"),
+  new StoreSession("session_5"),
 ];
 const slaveClients = [];
 userbots.map((userbot, index) => {
@@ -27,15 +28,18 @@ userbots.map((userbot, index) => {
 
 const startClients = async () => {
   try {
-    await slaveClients[0].start({
-      phoneNumber: userbots[0].phoneNumber,
-      password: async () => await askQuestions("Please enter your password: "),
-      phoneCode: async () =>
-        await askQuestions("Please enter the code you received: "),
-      onError: (err) => console.log(err),
-    });
+    for (let i = 0; i < slaveClients.length; i++) {
+      await slaveClients[i].start({
+        phoneNumber: userbots[i].phoneNumber,
+        password: async () =>
+          await askQuestions("Please enter your password: "),
+        phoneCode: async () =>
+          await askQuestions("Please enter the code you received: "),
+        onError: (err) => console.log(err),
+      });
 
-    await slaveClients[0].disconnect();
+      await slaveClients[i].disconnect();
+    }
 
     /*  Logger - create sessions */
     console.log(`${new Date()} -- Sessions created`);

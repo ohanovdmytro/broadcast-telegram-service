@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const userbots = [
   {
     botId: 1,
@@ -23,15 +25,12 @@ const userbots = [
     apiHash: process.env.API_HASH_4,
     phoneNumber: process.env.PHONE_NUMBER_4,
   },
+  {
+    botId: 5,
+    apiId: Number(process.env.API_ID_5),
+    apiHash: process.env.API_HASH_5,
+    phoneNumber: process.env.PHONE_NUMBER_5,
+  },
 ];
 
-const masterbot = {
-  apiId: Number(process.env.API_ID_MASTER),
-  apiHash: process.env.API_HASH_MASTER,
-  phoneNumber: process.env.PHONE_NUMBER_MASTER,
-};
-
-module.exports = {
-  userbots,
-  masterbot,
-};
+module.exports = { userbots };

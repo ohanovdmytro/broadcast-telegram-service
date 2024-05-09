@@ -2,11 +2,16 @@
 node_modules
 
 session_master
-session_1
-session_2
-session_3
-session_4
+# session_1
+# session_2
+# session_3
+# session_4
+session_*
 
 storage/users.json
 
 ecosystem.config.js
+
+lastUserIndex.txt
+
+services/send/cache.csv
