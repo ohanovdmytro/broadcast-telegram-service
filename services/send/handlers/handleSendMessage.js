@@ -17,7 +17,11 @@ async function handleSendMessage() {
 
   if (lastUserIndex > previousLastUserIndex) {
     for (let i = previousLastUserIndex + 1; i <= lastUserIndex; i++) {
+      if (usernames[i] === "") {
+        return;
+      }
       await sendMessage(usernames[i]);
+      fs.writeFileSync("lastUserIndex.txt", lastUserIndex.toString(), "utf8");
     }
   }
 }

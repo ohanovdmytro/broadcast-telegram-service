@@ -10,6 +10,9 @@ const slaveSessions = [
   new StoreSession("session_3"),
   new StoreSession("session_4"),
   new StoreSession("session_5"),
+  new StoreSession("session_6"),
+  new StoreSession("session_7"),
+  new StoreSession("session_8"),
 ];
 const slaveClients = userbots.map((userbot, index) => {
   return new TelegramClient(
@@ -52,8 +55,6 @@ async function sendMessage(username) {
         }`
       );
 
-      fs.writeFileSync("lastUserIndex.txt", lastUserIndex.toString(), "utf8");
-      
       /* Logger - save index */
       console.log(`${new Date()} -- Index saved`);
 
@@ -64,7 +65,7 @@ async function sendMessage(username) {
         `Error sending message to user ${username} using client ${
           slaveClientsCounter + 1
         }:`,
-        error
+        error.message
       );
       slaveClientsCounter++;
     }
