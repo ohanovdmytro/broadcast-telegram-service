@@ -5,6 +5,8 @@ const { sendMessage } = require("./sendMessage");
 
 async function handleSendMessage() {
   const usernames = await readCache();
+  const usernamesToSend = [];
+  const totalIndex = 0;
 
   /* Logger - username read */
   console.log(`${new Date()} -- Usernames read`);

@@ -22,12 +22,15 @@ const slaveClients = userbots.map((userbot, index) => {
   );
 });
 
-async function sendMessage(username) {
+async function sendMessage(usernames) {
   let slaveClientsCounter = 0;
   let messageSent = false;
+  let userIndex = 0;
 
-  while (slaveClientsCounter < slaveClients.length && !messageSent) {
+  console.log(usernames);
+  while (userIndex < usernames.length) {
     const slaveClient = slaveClients[slaveClientsCounter];
+
     try {
       /* Connect client */
       await slaveClient.connect();
@@ -35,25 +38,39 @@ async function sendMessage(username) {
       /* Define parse mode */
       await slaveClient.setParseMode("html");
 
-      /* Get user entities */
-      const receiver = await slaveClient.getInputEntity(username);
+      for (let i = 0; i < 4; i++) {
+        console.log(usernames[userIndex]);
+        const username = usernames[userIndex];
+        if (!username) break;
 
-      /* Logger - entity */
-      console.log(
-        `${new Date()} -- Got user entity from slave_${slaveClientsCounter + 1}`
-      );
+        console.log(`Sending from slave_${slaveClientsCounter} to ${username}`);
 
-      /* Send message from slave client */
-      await slaveClient.sendMessage(receiver, {
-        message: getMessage(),
-      });
+        /* Get user entities */
+        const receiver = await slaveClient.getInputEntity(username);
 
-      /* Logger - sent mes */
-      console.log(
-        `${new Date()} -- Message sent to ${username} using client ${
-          slaveClientsCounter + 1
-        }`
-      );
+        /* Logger - entity */
+        console.log(
+          `${new Date()} -- Got user entity from slave_${
+            slaveClientsCounter + 1
+          }`
+        );
+
+        /* Send message from slave client */
+        await slaveClient.sendMessage(receiver, {
+          message: getMessage(),
+        });
+
+        /* Logger - sent mes */
+        console.log(
+          `${new Date()} -- Message sent to ${username} using client ${
+            slaveClientsCounter + 1
+          }`
+        );
+
+        userIndex++;
+
+        if (userIndex >= usernames.length) break;
+      }
 
       /* Logger - save index */
       console.log(`${new Date()} -- Index saved`);
@@ -61,13 +78,14 @@ async function sendMessage(username) {
       messageSent = true;
       await slaveClient.disconnect();
     } catch (error) {
-      console.error(
-        `Error sending message to user ${username} using client ${
-          slaveClientsCounter + 1
-        }:`,
-        error.message
-      );
-      slaveClientsCounter++;
+      console.log(error);
+      // console.error(
+      //   `Error sending message using client ${
+      //     slaveClientsCounter + 1
+      //   }: ${error}`
+      // );
+
+      slaveClientsCounter = (slaveClientsCounter + 1) % slaveClients.length;
     }
   }
 }
