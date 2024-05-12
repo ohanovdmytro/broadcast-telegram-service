@@ -6,9 +6,6 @@ async function writeCache(user) {
   const name = `${user.firstName || ""} ${user.lastName || ""}`;
   const id = parseInt(user.id);
 
-  const userArray = [id, username, name];
-  const csvContent = userArray.join(",") + "\n";
-
   const cacheFilePath = path.resolve(
     __dirname,
     "../../services/send/cache.csv"
@@ -22,6 +19,11 @@ async function writeCache(user) {
     const lines = existingContent.trim().split("\n");
     const existingIds = lines.map((line) => parseInt(line.split(",")[0]));
 
+    const userArray = [lines.length, id, username, name, "false"];
+    const csvContent = userArray.join(",") + "\n";
+
+    fs.appendFileSync(cacheFilePath, csvContent, { encoding: "UTF-8" });
+
     if (existingIds.includes(id)) {
       console.log(
         `${Date()} -- User with ID ${id} already exists in the CSV file.`
@@ -31,8 +33,6 @@ async function writeCache(user) {
   } catch (error) {
     console.error("Error reading file", error);
   }
-
-  fs.appendFileSync(cacheFilePath, csvContent, { encoding: "UTF-8" });
 }
 
 module.exports = { writeCache };

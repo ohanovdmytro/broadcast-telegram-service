@@ -22,70 +22,46 @@ const slaveClients = userbots.map((userbot, index) => {
   );
 });
 
-async function sendMessage(usernames) {
-  let slaveClientsCounter = 0;
-  let messageSent = false;
-  let userIndex = 0;
+async function sendMessage(username, slaveIndex) {
+  const slaveClient = slaveClients[slaveIndex];
 
-  console.log(usernames);
-  while (userIndex < usernames.length) {
-    const slaveClient = slaveClients[slaveClientsCounter];
+  try {
+    /* Connect client */
+    await slaveClient.connect();
 
-    try {
-      /* Connect client */
-      await slaveClient.connect();
+    /* Define parse mode */
+    await slaveClient.setParseMode("html");
 
-      /* Define parse mode */
-      await slaveClient.setParseMode("html");
+    /* Get user entity */
+    const receiver = await slaveClient.getInputEntity(username);
 
-      for (let i = 0; i < 4; i++) {
-        console.log(usernames[userIndex]);
-        const username = usernames[userIndex];
-        if (!username) break;
+    /* Logger - entity */
+    console.log(
+      `${new Date()} -- Got user entity from slave_${slaveIndex + 1}`
+    );
 
-        console.log(`Sending from slave_${slaveClientsCounter} to ${username}`);
+    /* Send message from slave client */
+    await slaveClient.sendMessage(receiver, {
+      message: getMessage(),
+    });
 
-        /* Get user entities */
-        const receiver = await slaveClient.getInputEntity(username);
+    /* Logger - sent message */
+    console.log(
+      `${new Date()} -- Message sent to ${username} using client ${
+        slaveIndex + 1
+      }`
+    );
 
-        /* Logger - entity */
-        console.log(
-          `${new Date()} -- Got user entity from slave_${
-            slaveClientsCounter + 1
-          }`
-        );
+    await slaveClient.disconnect();
+  } catch (error) {
+    console.error(
+      `Error sending message to user ${username} using client ${
+        slaveIndex + 1
+      }: ${error.message}`
+    );
 
-        /* Send message from slave client */
-        await slaveClient.sendMessage(receiver, {
-          message: getMessage(),
-        });
-
-        /* Logger - sent mes */
-        console.log(
-          `${new Date()} -- Message sent to ${username} using client ${
-            slaveClientsCounter + 1
-          }`
-        );
-
-        userIndex++;
-
-        if (userIndex >= usernames.length) break;
-      }
-
-      /* Logger - save index */
-      console.log(`${new Date()} -- Index saved`);
-
-      messageSent = true;
-      await slaveClient.disconnect();
-    } catch (error) {
-      console.log(error);
-      // console.error(
-      //   `Error sending message using client ${
-      //     slaveClientsCounter + 1
-      //   }: ${error}`
-      // );
-
-      slaveClientsCounter = (slaveClientsCounter + 1) % slaveClients.length;
+    if (error.message === "400: PEER_FLOOD (caused by messages.SendMessage)") {
+      return;
     }
   }
 }

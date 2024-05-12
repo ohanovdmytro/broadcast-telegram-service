@@ -7,9 +7,18 @@ async function readCache() {
     });
 
     const lines = existingContent.trim().split("\n");
-    const usernames = lines.map((line) => line.split(",")[2].trim());
-    
-    return usernames;
+    const users = lines.map((line) => {
+      const [index, id, username, name, isSent] = line.split(",");
+      return {
+        index: parseInt(index),
+        id: parseInt(id),
+        username: username.trim(),
+        name: name.trim(),
+        isSent: isSent.trim() === "true",
+      };
+    });
+
+    return users;
   } catch (error) {
     console.error("Error reading file", error);
     return [];

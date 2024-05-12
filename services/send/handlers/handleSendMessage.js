@@ -1,30 +1,55 @@
 const fs = require("fs");
-
 const { readCache } = require("../helpers/readCache");
 const { sendMessage } = require("./sendMessage");
+const { userbots } = require("../const/userbots");
 
 async function handleSendMessage() {
-  const usernames = await readCache();
-  const usernamesToSend = [];
-  const totalIndex = 0;
+  const users = await readCache();
 
-  /* Logger - username read */
-  console.log(`${new Date()} -- Usernames read`);
+  /* Logger - users read */
+  console.log(`${new Date()} -- Users read`);
 
-  const lastUserIndex = usernames.length > 0 ? usernames.length - 1 : -1;
+  for (const user of users) {
+    if (!user.username || user.username === "") {
+      continue;
+    }
 
-  const previousLastUserIndex = fs.existsSync("lastUserIndex.txt")
-    ? parseInt(fs.readFileSync("lastUserIndex.txt", "utf8"))
-    : -1;
-
-  if (lastUserIndex > previousLastUserIndex) {
-    for (let i = previousLastUserIndex + 1; i <= lastUserIndex; i++) {
-      if (usernames[i] === "") {
+    if (!user.isSent) {
+      const slaveIndex = Math.floor(user.index / 4);
+      if (slaveIndex > userbots.length) {
+        /* Logger - too many message */
+        console.log(
+          `${new Date()} -- More than ${
+            (userbots.length + 1) * 4
+          } messages sent`
+        );
         return;
       }
-      await sendMessage(usernames[i]);
-      fs.writeFileSync("lastUserIndex.txt", lastUserIndex.toString(), "utf8");
+
+      await sendMessage(user.username, slaveIndex);
+      user.isSent = true;
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
+  }
+
+  writeCache(users);
+}
+
+async function writeCache(users) {
+  try {
+    const cacheFilePath = "cache.csv";
+    const csvContent = users
+      .map(
+        (user) =>
+          `${user.index},${user.id},${user.username},${user.name},${user.isSent}`
+      )
+      .join("\n");
+
+    fs.writeFileSync(cacheFilePath, csvContent, { encoding: "UTF-8" });
+    console.log(`${new Date()} -- Cache updated.`);
+  } catch (error) {
+    console.error("Error writing file", error);
   }
 }
 
