@@ -1,29 +1,10 @@
 const fs = require("fs");
-const { TelegramClient } = require("telegram");
-const { StoreSession } = require("telegram/sessions");
+
 const { getMessage } = require("../helpers/getMessage");
-const { userbots } = require("../const/userbots");
 
-const slaveSessions = [
-  new StoreSession("session_1"),
-  new StoreSession("session_2"),
-  new StoreSession("session_3"),
-  new StoreSession("session_4"),
-  new StoreSession("session_5"),
-  new StoreSession("session_6"),
-  new StoreSession("session_7"),
-  new StoreSession("session_8"),
-];
-const slaveClients = userbots.map((userbot, index) => {
-  return new TelegramClient(
-    slaveSessions[index],
-    userbot.apiId,
-    userbot.apiHash
-  );
-});
-
-async function sendMessage(username, slaveIndex) {
-  const slaveClient = slaveClients[slaveIndex];
+async function sendMessage(props) {
+  const { username, client, slaveIndex } = props;
+  const slaveClient = client;
 
   try {
     /* Connect client */
@@ -57,7 +38,7 @@ async function sendMessage(username, slaveIndex) {
     console.error(
       `Error sending message to user ${username} using client ${
         slaveIndex + 1
-      }: ${error.message}`
+      }: ${error}`
     );
 
     if (error.message === "400: PEER_FLOOD (caused by messages.SendMessage)") {
