@@ -22,18 +22,22 @@ async function sendMessage(props) {
     );
 
     /* Send message from slave client */
-    await slaveClient.sendMessage(receiver, {
+    const res = await slaveClient.sendMessage(receiver, {
       message: getMessage(),
     });
 
-    /* Logger - sent message */
-    console.log(
-      `${new Date()} -- Message sent to ${username} using client ${
-        slaveIndex + 1
-      }`
-    );
+    if (res) {
+      /* Logger - sent message */
+      console.log(
+        `${new Date()} -- Message sent to ${username} using client ${
+          slaveIndex + 1
+        }`
+      );
 
-    await slaveClient.disconnect();
+      await slaveClient.disconnect();
+
+      return "sent";
+    }
   } catch (error) {
     console.error(
       `Error sending message to user ${username} using client ${
@@ -42,7 +46,7 @@ async function sendMessage(props) {
     );
 
     if (error.message === "400: PEER_FLOOD (caused by messages.SendMessage)") {
-      return;
+      return "error";
     }
   }
 }

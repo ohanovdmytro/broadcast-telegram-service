@@ -5,16 +5,9 @@ const { readCache } = require("../helpers/readCache");
 const { sendMessage } = require("./sendMessage");
 const { userbots } = require("../const/userbots");
 
-const slaveSessions = [
-  new StoreSession("session_1"),
-  new StoreSession("session_2"),
-  new StoreSession("session_3"),
-  new StoreSession("session_4"),
-  new StoreSession("session_5"),
-  new StoreSession("session_6"),
-  new StoreSession("session_7"),
-  new StoreSession("session_8"),
-];
+const slaveSessions = userbots.map(
+  (_, index) => new StoreSession(`session_${index + 1}`)
+);
 const slaveClients = userbots.map((userbot, index) => {
   return new TelegramClient(
     slaveSessions[index],
@@ -26,34 +19,36 @@ const slaveClients = userbots.map((userbot, index) => {
 async function handleSendMessage() {
   const users = await readCache();
 
-  /* Logger - users read */
   console.log(`${new Date()} -- Users read`);
 
   let clientIndex = 0;
   let sentCount = 0;
 
-  while (true) {
-    if (!users.some((user) => !user.isSent)) {
-      break;
-    }
+  const usersToSend = users.filter(
+    (user) => !user.isSent && user.username && user.username !== ""
+  );
 
-    for (const user of users) {
-      if (user.isSent || !user.username || user.username === "") {
-        continue;
-      }
-
+  for (const user of usersToSend) {
+    let messageSent = false;
+    while (!messageSent) {
       const client = slaveClients[clientIndex];
 
-      await sendMessage({
+      const res = await sendMessage({
         username: user.username,
         client: client,
         slaveIndex: clientIndex,
       });
-      user.isSent = true;
 
-      sentCount++;
+      if (res === "sent") {
+        user.isSent = true;
+        sentCount++;
+        messageSent = true;
 
-      if (sentCount % 3 === 0) {
+        if (sentCount === 3) {
+          sentCount = 0;
+          clientIndex = (clientIndex + 1) % slaveClients.length;
+        }
+      } else if (res === "error") {
         clientIndex = (clientIndex + 1) % slaveClients.length;
       }
 

@@ -6,18 +6,10 @@ const { StoreSession } = require("telegram/sessions");
 const { askQuestions } = require("./askQuestions");
 const { userbots } = require("../const/userbots");
 
-const slaveSessions = [
-  new StoreSession("session_1"),
-  new StoreSession("session_2"),
-  new StoreSession("session_3"),
-  new StoreSession("session_4"),
-  new StoreSession("session_5"),
-  new StoreSession("session_6"),
-  new StoreSession("session_7"),
-  new StoreSession("session_8"),
-];
-const slaveClients = [];
-userbots.map((userbot, index) => {
+const slaveSessions = userbots.map(
+  (_, index) => new StoreSession(`session_${index + 1}`)
+);
+const slaveClients = userbots.map((userbot, index) => {
   const client = new TelegramClient(
     slaveSessions[index],
     userbot.apiId,

@@ -17,12 +17,7 @@ async function writeCache(user) {
     existingContent = fs.readFileSync(cacheFilePath, { encoding: "UTF-8" });
 
     const lines = existingContent.trim().split("\n");
-    const existingIds = lines.map((line) => parseInt(line.split(",")[0]));
-
-    const userArray = [lines.length, id, username, name, "false"];
-    const csvContent = userArray.join(",") + "\n";
-
-    fs.appendFileSync(cacheFilePath, csvContent, { encoding: "UTF-8" });
+    const existingIds = lines.map((line) => parseInt(line.split(",")[1]));
 
     if (existingIds.includes(id)) {
       console.log(
@@ -30,6 +25,11 @@ async function writeCache(user) {
       );
       return;
     }
+
+    const userArray = [lines.length, id, username, name, "false"];
+    const csvContent = userArray.join(",") + "\n";
+
+    fs.appendFileSync(cacheFilePath, csvContent, { encoding: "UTF-8" });
   } catch (error) {
     console.error("Error reading file", error);
   }
