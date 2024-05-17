@@ -10,7 +10,7 @@ const slaveSessions = userbots.map(
   (_, index) => new StoreSession(`session_${index + 1}`)
 );
 const slaveClients = userbots.map((userbot, index) => {
-  const client = new TelegramClient(
+  return new TelegramClient(
     slaveSessions[index],
     userbot.apiId,
     userbot.apiHash,
@@ -18,7 +18,6 @@ const slaveClients = userbots.map((userbot, index) => {
       connectionRetries: 5,
     }
   );
-  slaveClients.push(client);
 });
 
 const startClients = async () => {

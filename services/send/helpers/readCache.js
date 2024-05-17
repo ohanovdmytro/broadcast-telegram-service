@@ -2,21 +2,11 @@ const fs = require("fs");
 
 async function readCache() {
   try {
-    const existingContent = fs.readFileSync("cache.csv", {
+    const existingDbContent = fs.readFileSync("db.json", {
       encoding: "UTF-8",
     });
 
-    const lines = existingContent.trim().split("\n");
-    const users = lines.map((line) => {
-      const [index, id, username, name, isSent] = line.split(",");
-      return {
-        index: parseInt(index),
-        id: parseInt(id),
-        username: username.trim(),
-        name: name.trim(),
-        isSent: isSent.trim() === "true",
-      };
-    });
+    const users = JSON.parse(existingDbContent);
 
     return users;
   } catch (error) {

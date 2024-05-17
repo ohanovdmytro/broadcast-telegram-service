@@ -10,10 +10,15 @@ async function writeCache(user) {
     __dirname,
     "../../services/send/cache.csv"
   );
+  const dbFilePath = path.resolve(__dirname, "../../services/send/db.json");
 
   try {
-    let existingContent = "";
+    // Read and update cache.csv
+    if (!fs.existsSync(cacheFilePath)) {
+      fs.writeFileSync(cacheFilePath, "", { encoding: "UTF-8" });
+    }
 
+    let existingContent = "";
     existingContent = fs.readFileSync(cacheFilePath, { encoding: "UTF-8" });
 
     const lines = existingContent.trim().split("\n");
@@ -21,17 +26,48 @@ async function writeCache(user) {
 
     if (existingIds.includes(id)) {
       console.log(
-        `${Date()} -- User with ID ${id} already exists in the CSV file.`
+        `${Date()} -- User ${username} already exists in the CSV file.`
       );
       return;
     }
 
-    const userArray = [lines.length, id, username, name, "false"];
-    const csvContent = userArray.join(",") + "\n";
+    const userArray = [lines.length + 1, id, username, name, "false"];
+    const csvContent = "\n" + userArray.join(",");
 
     fs.appendFileSync(cacheFilePath, csvContent, { encoding: "UTF-8" });
+
+    console.log(`${Date()} -- Added ${username} to CSV file.`);
+
+    // Read and update db.json
+    let dbData = [];
+    if (fs.existsSync(dbFilePath)) {
+      const existingDbContent = fs.readFileSync(dbFilePath, {
+        encoding: "UTF-8",
+      });
+      dbData = JSON.parse(existingDbContent);
+    }
+
+    if (!dbData.some((entry) => entry.chatId === id)) {
+      dbData.push({
+        index: dbData.length,
+        chat_id: id,
+        username: username,
+        name: name,
+        isSent: false,
+      });
+
+      fs.writeFileSync(dbFilePath, JSON.stringify(dbData, null, 2), {
+        encoding: "UTF-8",
+      });
+
+      console.log(`${Date()} -- Added ${username} to JSON file.`);
+    } else {
+      console.log(
+        `${Date()} -- User ${username} already exists in the JSON file.`
+      );
+    }
   } catch (error) {
-    console.error("Error reading file", error);
+    console.error("Error reading or writing cache file: ", error);
   }
 }
 

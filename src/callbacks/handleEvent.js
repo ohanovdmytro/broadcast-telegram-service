@@ -22,11 +22,6 @@ async function handleEvent(handleEvent) {
           const userEntity = await masterClient.getEntity(userId);
 
           await writeCache(userEntity);
-
-          /* Logger - writeCache */
-          console.log(
-            `${new Date()} -- Wrote ${userEntity.username} to cache file`
-          );
         } catch (error) {
           console.error("Error fetching username and writing it", error);
         }

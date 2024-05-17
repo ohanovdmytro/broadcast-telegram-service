@@ -60,15 +60,18 @@ async function handleSendMessage() {
 
 async function writeCache(users) {
   try {
-    const cacheFilePath = "cache.csv";
     const csvContent = users
       .map(
         (user) =>
-          `${user.index},${user.id},${user.username},${user.name},${user.isSent}`
+          `${user.index},${user.chat_id},${user.username},${user.name},${user.isSent}`
       )
       .join("\n");
 
-    fs.writeFileSync(cacheFilePath, csvContent, { encoding: "UTF-8" });
+    fs.writeFileSync("cache.csv", csvContent, { encoding: "UTF-8" });
+
+    fs.writeFileSync("db.json", JSON.stringify(users, null, 2), {
+      encoding: "UTF-8",
+    });
     console.log(`${new Date()} -- Cache updated.`);
   } catch (error) {
     console.error("Error writing file", error);

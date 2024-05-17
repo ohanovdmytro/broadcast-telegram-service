@@ -1,5 +1,6 @@
 .env
 node_modules
+db.json
 
 session_master
 # session_1
